@@ -610,6 +610,13 @@ class RaycasterCanvasComponent {
         this.fillCanvasWithBlack();
         this.ctx.putImageData(this.canvasImageData, 0, 0);
         this.sectorSize = this.size < 100 ? Math.round(this.size / 100 * 10) : this.size / 100 * 10;
+        let uid = (0, _raycasterBuilder.RayCasterBuilder).uuid();
+        const body = document.getElementsByTagName("body")[0];
+        const div = document.createElement("div");
+        const text = document.createTextNode(uid);
+        div.appendChild(text);
+        body.appendChild(div);
+        window.history.pushState({}, uid, `?uid=${uid}`);
     }
     fillCanvasWithBlack() {
         if (this.ctx && this.rawImageData && this.canvasImageData) {
@@ -619,25 +626,25 @@ class RaycasterCanvasComponent {
     }
     draw(from_x, to_x, from_y, to_y) {
         const plane = (0, _raycasterBuilder.RayCasterBuilder).createPlane();
-        plane.setMatrix((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(0, 0.01, 0));
+        plane.setTransform((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(0, 0.01, 0));
         const floorMaterial = plane.getMaterial();
         floorMaterial.setColor(new (0, _raycasterModel.Color)(1, 0.9, 0.9));
         floorMaterial.setSpecular(0);
         plane.setMaterial(floorMaterial);
         const middleSphere = (0, _raycasterBuilder.RayCasterBuilder).createSphere();
-        middleSphere.setMatrix((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(-0.5, 1, 0.5));
+        middleSphere.setTransform((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(-0.5, 1, 0.5));
         const middleSphereMaterial = middleSphere.getMaterial();
         middleSphereMaterial.setDiffuse(0.7);
         middleSphereMaterial.setSpecular(0.3);
         middleSphere.setMaterial(middleSphereMaterial);
         const rightSphere = (0, _raycasterBuilder.RayCasterBuilder).createSphere();
-        rightSphere.setMatrix((0, _raycasterMath.RayCasterArithmetic).multiplyMatrix((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(1.5, 0.5, -0.5), (0, _raycasterBuilder.RayCasterBuilder).getScalingMatrix(0.5, 0.5, 0.5)));
+        rightSphere.setTransform((0, _raycasterMath.RayCasterArithmetic).multiplyMatrix((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(1.5, 0.5, -0.5), (0, _raycasterBuilder.RayCasterBuilder).getScalingMatrix(0.5, 0.5, 0.5)));
         const rightSphereMaterial = rightSphere.getMaterial();
         rightSphereMaterial.setDiffuse(0.7);
         rightSphereMaterial.setSpecular(0.3);
         rightSphere.setMaterial(rightSphereMaterial);
         const leftSphere = (0, _raycasterBuilder.RayCasterBuilder).createSphere();
-        leftSphere.setMatrix((0, _raycasterMath.RayCasterArithmetic).multiplyMatrix((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(-1.5, 0.33, -0.75), (0, _raycasterBuilder.RayCasterBuilder).getScalingMatrix(0.33, 0.33, 0.33)));
+        leftSphere.setTransform((0, _raycasterMath.RayCasterArithmetic).multiplyMatrix((0, _raycasterBuilder.RayCasterBuilder).getTranslationMatrix(-1.5, 0.33, -0.75), (0, _raycasterBuilder.RayCasterBuilder).getScalingMatrix(0.33, 0.33, 0.33)));
         const leftSphereMaterial = leftSphere.getMaterial();
         rightSphereMaterial.setDiffuse(0.7);
         rightSphereMaterial.setSpecular(0.3);
@@ -684,7 +691,7 @@ let rayCasterCanvasComponent = new RaycasterCanvasComponent();
 rayCasterCanvasComponent.initializeCanvasAndSizes();
 rayCasterCanvasComponent.callBack();
 
-},{"./app.ts":"kuM8f","./lib/builder/raycaster.builder":"8Y0dX","./lib/imaging/raycaster.imaging":"ikjZ5","./lib/math/raycaster.math":"etNMF","./lib/model/raycaster.model":"lKoRf","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kuM8f":[function(require,module,exports) {
+},{"./app.ts":"kuM8f","./lib/imaging/raycaster.imaging":"ikjZ5","./lib/math/raycaster.math":"etNMF","./lib/model/raycaster.model":"lKoRf","./lib/builder/raycaster.builder":"8Y0dX","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"kuM8f":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _raycasterBuilder = require("./lib/builder/raycaster.builder");
@@ -821,7 +828,7 @@ class RayCasterBuilder {
         const defaultOuterSphere = new (0, _raycasterModel.Sphere)();
         defaultOuterSphere.setMaterial(new (0, _raycasterModel.Material)(0.1, 0.7, 0.2, 200, new (0, _raycasterModel.Color)(0.8, 1.0, 0.6)));
         const defaultInnerSphere = new (0, _raycasterModel.Sphere)();
-        defaultInnerSphere.setMatrix(RayCasterBuilder.getScalingMatrix(0.5, 0.5, 0.5));
+        defaultInnerSphere.setTransform(RayCasterBuilder.getScalingMatrix(0.5, 0.5, 0.5));
         return new (0, _raycasterModel.World)(defaultLight, [
             defaultOuterSphere,
             defaultInnerSphere
@@ -914,7 +921,7 @@ class RayCasterArithmetic {
         }
         return (0, _raycasterBuilder.RayCasterBuilder).createMatrix(multiplicationResultNumbers, a.getRows(), b.getColumns());
     }
-    static transposeMatrix(a) {
+    static transpose(a) {
         const numbers = [];
         for(let r = 0; r < a.getRows(); r++)for(let c = 0; c < a.getColumns(); c++)numbers.push(a.getNumber(c, r));
         return (0, _raycasterBuilder.RayCasterBuilder).createMatrix(numbers, a.getColumns(), a.getRows());
@@ -1005,17 +1012,26 @@ class RayCasterArithmetic {
         const candidates = [];
         for (const intersection of intersections.getIntersections())if (intersection.getT() >= 0) candidates.push(intersection);
         candidates.sort((a, b)=>a.getT() - b.getT());
+        if (candidates.length === 0) return null;
         return candidates[0];
     }
     static transform(ray, translationMatrix) {
         const resultRay = (0, _raycasterBuilder.RayCasterBuilder).createRay(this.multiplyMatrixWithPoint(translationMatrix, ray.getOrigin()), this.multiplyMatrixWithVector(translationMatrix, ray.getDirection()));
         return resultRay;
     }
+    static normalAtPlane(worldObject, world_point) {
+        const object_point = RayCasterArithmetic.multiplyMatrixWithPoint(RayCasterArithmetic.inverse(worldObject.getTransform()), world_point);
+        const object_normal = worldObject.normalAt(object_point);
+        const world_normal = RayCasterArithmetic.multiplyMatrixWithVector(RayCasterArithmetic.transpose(RayCasterArithmetic.inverse(worldObject.getTransform())), object_normal);
+        world_normal.w = 0;
+        return RayCasterArithmetic.normalize(world_normal);
+    }
     static normalAt(worldObject, world_point) {
+        if (worldObject instanceof (0, _raycasterModel.Plane)) return this.normalAtPlane(worldObject, world_point);
         const worldObjectOrigin = (0, _raycasterBuilder.RayCasterBuilder).createPoint(0, 0, 0);
-        const object_point = RayCasterArithmetic.multiplyMatrixWithPoint(RayCasterArithmetic.inverse(worldObject.getMatrix()), world_point);
+        const object_point = RayCasterArithmetic.multiplyMatrixWithPoint(RayCasterArithmetic.inverse(worldObject.getTransform()), world_point);
         const object_normal = RayCasterArithmetic.substractPoints(object_point, worldObjectOrigin);
-        const world_normal = RayCasterArithmetic.multiplyMatrixWithVector(RayCasterArithmetic.transposeMatrix(RayCasterArithmetic.inverse(worldObject.getMatrix())), object_normal);
+        const world_normal = RayCasterArithmetic.multiplyMatrixWithVector(RayCasterArithmetic.transpose(RayCasterArithmetic.inverse(worldObject.getTransform())), object_normal);
         world_normal.w = 0;
         return RayCasterArithmetic.normalize(world_normal);
     }
@@ -1315,10 +1331,10 @@ class Shape {
     getId() {
         return this.id;
     }
-    getMatrix() {
+    getTransform() {
         return this.matrix;
     }
-    setMatrix(m) {
+    setTransform(m) {
         this.matrix = m;
     }
     getMaterial() {
@@ -1327,26 +1343,26 @@ class Shape {
     setMaterial(material) {
         this.material = (0, _raycasterBuilder.RayCasterBuilder).createMaterial(material.getAmbient(), material.getDiffuse(), material.getSpecular(), material.getShininess(), material.getColor());
     }
-    normal_at(point) {
+    normalAt(point) {
         const local_point = this.world_to_object(point);
         const local_normal = this.local_normal_at(local_point);
         return this.normal_to_world(local_normal);
     }
     intersect(ray) {
-        const transformedRay = (0, _raycasterMath.RayCasterArithmetic).transform(ray, (0, _raycasterMath.RayCasterArithmetic).inverse(this.getMatrix()));
+        const transformedRay = (0, _raycasterMath.RayCasterArithmetic).transform(ray, (0, _raycasterMath.RayCasterArithmetic).inverse(this.getTransform()));
         const result = this.local_intersect(transformedRay);
         return result;
     }
     world_to_object(point) {
-        return (0, _raycasterMath.RayCasterArithmetic).multiplyMatrixWithPoint((0, _raycasterMath.RayCasterArithmetic).inverse(this.getMatrix()), point);
+        return (0, _raycasterMath.RayCasterArithmetic).multiplyMatrixWithPoint((0, _raycasterMath.RayCasterArithmetic).inverse(this.getTransform()), point);
     }
     normal_to_world(normal) {
-        normal = (0, _raycasterMath.RayCasterArithmetic).multiplyMatrixWithVector((0, _raycasterMath.RayCasterArithmetic).transposeMatrix((0, _raycasterMath.RayCasterArithmetic).inverse(this.getMatrix())), normal);
+        normal = (0, _raycasterMath.RayCasterArithmetic).multiplyMatrixWithVector((0, _raycasterMath.RayCasterArithmetic).transpose((0, _raycasterMath.RayCasterArithmetic).inverse(this.getTransform())), normal);
         normal = (0, _raycasterMath.RayCasterArithmetic).normalize(normal);
         return normal;
     }
     equals(otherSphere) {
-        return this.material.equals(otherSphere.getMaterial()) && this.matrix.equals(otherSphere.getMatrix());
+        return this.material.equals(otherSphere.getMaterial()) && this.matrix.equals(otherSphere.getTransform());
     }
 }
 class TestShape extends Shape {
@@ -1567,18 +1583,6 @@ class Camera {
         this.halfHeight = -1;
         this.calculatePixelSize();
     }
-    calculatePixelSize() {
-        const halfView = Math.tan(this.fieldOfView / 2);
-        const aspect = this.hsize / this.vsize;
-        if (aspect >= 1) {
-            this.halfWidth = halfView;
-            this.halfHeight = halfView / aspect;
-        } else {
-            this.halfWidth = halfView * aspect;
-            this.halfHeight = halfView;
-        }
-        this.pixelSize = this.halfWidth * 2 / this.hsize;
-    }
     getHSize() {
         return this.hsize;
     }
@@ -1602,6 +1606,18 @@ class Camera {
     }
     getHalfHeight() {
         return this.halfHeight;
+    }
+    calculatePixelSize() {
+        const halfView = Math.tan(this.fieldOfView / 2);
+        const aspect = this.hsize / this.vsize;
+        if (aspect >= 1) {
+            this.halfWidth = halfView;
+            this.halfHeight = halfView / aspect;
+        } else {
+            this.halfWidth = halfView * aspect;
+            this.halfHeight = halfView;
+        }
+        this.pixelSize = this.halfWidth * 2 / this.hsize;
     }
 }
 
