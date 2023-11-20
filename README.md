@@ -1,1 +1,1 @@
-# test
+# ECMAScript Raytracer Demo

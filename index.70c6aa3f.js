@@ -142,13 +142,13 @@
       this[globalName] = mainExports;
     }
   }
-})({"gmPuC":[function(require,module,exports) {
+})({"iPuCL":[function(require,module,exports) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
-module.bundle.HMR_BUNDLE_ID = "5c1b77e3b71e74eb";
+module.bundle.HMR_BUNDLE_ID = "2694362170c6aa3f";
 "use strict";
 /* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
 import type {
@@ -574,7 +574,7 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
     });
 }
 
-},{}],"h7u1C":[function(require,module,exports) {
+},{}],"gATzl":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "RaycasterCanvasComponent", ()=>RaycasterCanvasComponent);
@@ -611,13 +611,66 @@ class RaycasterCanvasComponent {
         this.ctx.putImageData(this.canvasImageData, 0, 0);
         this.sectorSize = this.size < 100 ? Math.round(this.size / 100 * 10) : this.size / 100 * 10;
         let uid = (0, _raycasterBuilder.RayCasterBuilder).uuid();
-        const body = document.getElementsByTagName("body")[0];
-        const div = document.createElement("div");
-        const text = document.createTextNode(uid);
-        div.appendChild(text);
-        body.appendChild(div);
+        const canvasParent = this.canvas.parentNode;
         window.history.pushState({}, uid, `?uid=${uid}`);
+        const resizableContainer = canvasParent;
+        var self = this;
+        // bind the mouse down event to startResize function
+        if (resizableContainer) {
+            resizableContainer.addEventListener("mousedown", (e)=>{
+                startResizing(e);
+            });
+            // Function to start resizing
+            function startResizing(e) {
+                e.preventDefault();
+                // Initial mouse position
+                const initialX = e.clientX;
+                const initialY = e.clientY;
+                // Initial dimensions of the resizable container
+                // @ts-ignore
+                const initialWidth = resizableContainer.offsetWidth;
+                // @ts-ignore
+                const initialHeight = resizableContainer.offsetHeight;
+                // Aspect ratio of the resizable container
+                const aspectRatio = initialWidth / initialHeight;
+                // Function to handle mouse move
+                function handleMouseMove(e) {
+                    const deltaX = e.clientX - initialX;
+                    const deltaY = e.clientY - initialY;
+                    // Calculate the new width and height while maintaining the aspect ratio
+                    const newWidth = initialWidth + deltaX;
+                    const newHeight = newWidth / aspectRatio;
+                    // Apply the new dimensions to the resizable container
+                    // @ts-ignore
+                    resizableContainer.style.width = `${newWidth}px`;
+                    // @ts-ignore
+                    resizableContainer.style.height = `${newHeight}px`;
+                }
+                // Function to handle mouse up
+                function handleMouseUp() {
+                    // Remove event listeners on mouse up
+                    window.removeEventListener("mousemove", handleMouseMove);
+                    window.removeEventListener("mouseup", handleMouseUp);
+                }
+                // Add event listeners for mouse move and mouse up
+                window.addEventListener("mousemove", handleMouseMove);
+                window.addEventListener("mouseup", handleMouseUp);
+                // Add event listener for mouse release
+                window.addEventListener("mouseup", handleMouseRelease);
+                // function to handle mouse release
+                function handleMouseRelease(e) {
+                    e.preventDefault();
+                    // Remove event listeners on mouse release
+                    window.removeEventListener("mousemove", handleMouseMove);
+                    window.removeEventListener("mouseup", handleMouseUp);
+                    window.removeEventListener("mouseup", handleMouseRelease);
+                    // call the resize canvas function
+                    self.reset();
+                }
+            }
+        }
     }
+    reset() {}
     fillCanvasWithBlack() {
         if (this.ctx && this.rawImageData && this.canvasImageData) {
             (0, _raycasterImaging.RayCasterImager).fillWithBlack(this.rawImageData, this.size, this.size);
@@ -5170,6 +5223,6 @@ class ImagingTestResults {
 `;
 }
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["gmPuC","h7u1C"], "h7u1C", "parcelRequire501f")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["iPuCL","gATzl"], "gATzl", "parcelRequire501f")
 
-//# sourceMappingURL=index.b71e74eb.js.map
+//# sourceMappingURL=index.70c6aa3f.js.map
