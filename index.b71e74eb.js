@@ -690,7 +690,7 @@ class RaycasterCanvasComponent {
         middleSphereMaterial.setShininess(300);
         middleSphereMaterial.setReflective(4);
         middleSphereMaterial.setTransparency(0.9);
-        middleSphereMaterial.setRefractiveIndex(100);
+        middleSphereMaterial.setRefractiveIndex(1.5);
         //middleSphereMaterial.pattern = RayCasterBuilder.buildStripePattern(WHITE, BLACK);
         middleSphere.setMaterial(middleSphereMaterial);
         const rightSphere = (0, _src.RayCasterBuilder).createSphere();
